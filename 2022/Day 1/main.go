@@ -20,9 +20,9 @@ func main() {
 	file := string(rawFile)
 
 	// process input
-	elfs := strings.Split(file, "\n\n")
+	elves := strings.Split(file, "\n\n")
 	var elfSums []int
-	for _, elf := range elfs {
+	for _, elf := range elves {
 		calories := strings.Split(elf, "\n")
 		sum := 0
 		for _, calorie := range calories {
@@ -39,5 +39,14 @@ func main() {
 	}
 	// Sort elf and Print result
 	sort.Ints(elfSums)
-	fmt.Printf("Elf with most food carries %v calories.", elfSums[len(elfSums)-1])
+	fmt.Printf("The Elf carrying the most food carries %v calories.\n", elfSums[len(elfSums)-1])
+
+	// Part 2
+
+	topElves := 0
+	for i := 1; i < 4; i++ {
+		topElves += elfSums[len(elfSums)-i]
+	}
+
+	fmt.Printf("Top 3 Elves are carrying %v calories.\n", topElves)
 }
