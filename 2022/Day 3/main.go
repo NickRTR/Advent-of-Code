@@ -25,9 +25,7 @@ func alphabeticalIndex(input rune) int {
 	return index
 }
 
-func main() {
-	input := readInput("input")
-
+func part1(input string) {
 	rucksacks := strings.Split(input, "\n")
 
 	prioritySum := 0
@@ -52,4 +50,55 @@ func main() {
 	}
 
 	fmt.Printf("Sum of the priorities of the duplicate item types is %v.\n", prioritySum)
+}
+
+func createMap() {
+
+}
+
+func part2(input string) {
+	lines := strings.Split(input, "\n")
+	var groups [][]string
+
+	// divide input into groups of three Elves
+	for i := 0; i < len(lines); i += 3 {
+		end := i + 3
+
+		if end > len(lines) {
+			end = len(lines)
+		}
+
+		groups = append(groups, lines[i:end])
+	}
+
+	prioritySum := 0
+
+	for _, g := range groups {
+		if len(g) == 3 {
+			var counter [3]map[rune]bool
+
+			for i := 0; i < 3; i++ {
+				counter[i] = make(map[rune]bool)
+
+				for _, item := range g[i] {
+					counter[i][item] = true
+				}
+			}
+
+			for item := range counter[0] {
+				if counter[1][item] && counter[2][item] {
+					prioritySum += alphabeticalIndex(item)
+					break
+				}
+			}
+		}
+	}
+
+	fmt.Printf("Sum of the priorities of the group badges is %v.\n", prioritySum)
+}
+
+func main() {
+	input := readInput("input")
+	part1(input)
+	part2(input)
 }
