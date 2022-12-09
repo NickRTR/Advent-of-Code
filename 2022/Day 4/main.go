@@ -23,6 +23,7 @@ func main() {
 	input := readInput("input.txt")
 
 	counter := 0
+	counter2 := 0
 
 	// split input into pairs of two
 	pairs := strings.Split(input, "\n")
@@ -46,7 +47,13 @@ func main() {
 			} else if fields[0] >= fields[2] && fields[1] <= fields[3] {
 				counter++
 			}
+
+			// Part 2
+			if fields[0] <= fields[3] && fields[1] >= fields[2] {
+				counter2++
+			}
 		}
 	}
 	fmt.Printf("In %v assignment pairs one range fully contains the other.\n", counter)
+	fmt.Printf("In %v assignment pairs there are ranges overlapping\n", counter2)
 }
