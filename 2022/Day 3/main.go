@@ -1,3 +1,5 @@
+// Exercise: https://adventofcode.com/2022/day/3
+
 package main
 
 import (
