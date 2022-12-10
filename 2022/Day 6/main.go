@@ -31,9 +31,7 @@ func check(input []string) bool {
 	return true
 }
 
-func main() {
-	input := strings.Split(readInput("input.txt"), "")
-
+func part1(input []string) {
 	if len(input) < 4 {
 		fmt.Println("Input too short!")
 		return
@@ -48,6 +46,30 @@ func main() {
 			return
 		}
 	}
+}
+
+func part2(input []string) {
+	if len(input) < 14 {
+		fmt.Println("Input too short!")
+		return
+	}
+
+	characters := input[0:14]
+
+	for i := 0; i < len(input)-13; i++ {
+		characters = input[i : i+14]
+		if check(characters) {
+			fmt.Printf("%v characters have to be processed to find the first start-of-message marker.\n", i+14)
+			return
+		}
+	}
+}
+
+func main() {
+	input := strings.Split(readInput("input.txt"), "")
+
+	part1(input)
+	part2(input)
 
 	fmt.Println("No markers found.")
 }
