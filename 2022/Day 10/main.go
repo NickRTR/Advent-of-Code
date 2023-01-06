@@ -19,10 +19,7 @@ func readInput(file string) string {
 	return string(rawFile)
 }
 
-func main() {
-	input := readInput("input.txt")
-	instructions := strings.Split(input, "\n")
-
+func part1(instructions []string) {
 	cycles := make(map[int]int)
 
 	cycle := 0
@@ -51,4 +48,11 @@ func main() {
 	}
 
 	fmt.Printf("The sum of all signal strengths is %v\n", signalStrengthSum)
+}
+
+func main() {
+	input := readInput("input.txt")
+	instructions := strings.Split(input, "\n")
+
+	part1(instructions)
 }
