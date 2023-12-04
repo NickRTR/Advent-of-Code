@@ -1,4 +1,4 @@
-// Exercise: https://adventofcode.com/2023/day/2
+// Exercise: https://adventofcode.com/2023/day/3
 
 package main
 
@@ -91,12 +91,7 @@ func validateGear(numbers map[string][]int, y int, x int) int {
 			count++
 			sum *= numbers[key][0]
 			id = numbers[key][1]
-			// if count == 1 {
-			// 	sum *= numbers[key][0]
-			// }
 			if count == 2 {
-				// fmt.Println(sum, numbers[key][0])
-				// fmt.Println()
 				return sum
 			}
 		}
@@ -116,13 +111,16 @@ func part2(grid [140][]string) int {
 			isNumber, _ := regexp.MatchString(`[0-9]`, character)
 			if isNumber {
 				number += grid[y][x]
-			} else if number != "" || x == len(row) {
-				converted, _ := strconv.Atoi(number)
-				start := x - len(number) + 1
-				id := rand.Int()
-				for i := start; i <= x; i++ {
-					key := fmt.Sprintf("%d,%d", y, i-1)
-					numbers[key] = []int{converted, id}
+			}
+			if x == len(row)-1 || !isNumber {
+				if number != "" {
+					converted, _ := strconv.Atoi(number)
+					id := rand.Int()
+					start := x - len(number) + 1
+					for i := start; i <= x; i++ {
+						key := fmt.Sprintf("%d,%d", y, i-1)
+						numbers[key] = []int{converted, id}
+					}
 				}
 				number = ""
 			}
