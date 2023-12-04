@@ -5,7 +5,6 @@ package main
 import (
 	"log"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -21,43 +20,69 @@ func part1(lines []string) int {
 	sum := 0
 
 	for _, line := range lines {
-		parts := strings.Split(line, ":")
-		game := strings.Split(parts[1], "|")
-
-		winValues := strings.Split(game[0], " ")
-		var winners []int
-
-		for _, number := range winValues {
-			if number != "" {
-				converted, _ := strconv.Atoi(number)
-				winners = append(winners, converted)
+		winCount := countWins(line)
+		score := 0
+		for i := 0; i < winCount; i++ {
+			if i == 0 {
+				score = 1
+			} else {
+				score *= 2
 			}
 		}
+		sum += score
+	}
+	return sum
+}
 
-		gameValues := strings.Split(game[1], " ")
-		var values []int
+func countWins(line string) int {
+	count := 0
 
-		for _, number := range gameValues {
-			if number != "" {
-				converted, _ := strconv.Atoi(number)
-				values = append(values, converted)
-			}
-		}
+	parts := strings.Split(line, ":")
+	game := strings.Split(parts[1], "|")
 
-		cardValue := 0
+	winners := strings.Split(strings.TrimSpace(game[0]), " ")
+	ours := strings.Split(strings.TrimSpace(game[1]), " ")
 
-		for _, value := range values {
-			for _, winner := range winners {
-				if value == winner {
-					if cardValue == 0 {
-						cardValue = 1
-					} else {
-						cardValue *= 2
+	for _, winner := range winners {
+		winner = strings.TrimSpace(winner)
+		if winner != "" {
+			for _, our := range ours {
+				our = strings.TrimSpace(our)
+				if our != "" {
+					if winner == our {
+						count++
 					}
 				}
 			}
 		}
-		sum += cardValue
+	}
+
+	return count
+}
+
+func part2(lines []string) int {
+	var cards = make([]int, len(lines))
+
+	for i := range cards {
+		cards[i] = 1
+	}
+
+	for i, line := range lines {
+		winCount := countWins(line)
+		countTo := i + winCount
+		// prevent counting beyond the end of the array
+		if countTo >= len(lines)-1 {
+			countTo = len(lines) - 1
+		}
+		for j := i + 1; j <= countTo; j++ {
+			cards[j] += cards[i]
+		}
+	}
+
+	// add up the total amount of cards
+	sum := 0
+	for _, card := range cards {
+		sum += card
 	}
 	return sum
 }
@@ -68,4 +93,5 @@ func main() {
 	lines := strings.Split(file, "\n")
 
 	println("Part 1: The total points the cards are worth is:", part1(lines))
+	println("Part 2: The total amount of scratchcards is:", part2(lines))
 }
