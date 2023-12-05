@@ -13,7 +13,7 @@ import (
 )
 
 func readInput(file string) string {
-	rawFile, err := os.ReadFile("input copy")
+	rawFile, err := os.ReadFile("input")
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -80,10 +80,45 @@ func part1(file string) int {
 	return min
 }
 
+func part2(file string) int {
+	sections := strings.Split(file, "\n\n")
+
+	seeds := make([]int, 0, len(sections[0]))
+
+	seedsString := strings.Split(sections[0], " ")
+
+	for i := 1; i < len(seedsString[1:])+1; i += 2 {
+		start, _ := strconv.Atoi(seedsString[i])
+		count, _ := strconv.Atoi(seedsString[i+1])
+		for j := start; j < start+count; j++ {
+			seeds = append(seeds, j)
+		}
+	}
+
+	for _, section := range sections[1:] {
+		lines := strings.Split(section, "\n")
+		seeds = convertSeed(seeds, lines[1:])
+	}
+
+	// find minimum location
+	min := math.MaxInt64
+	for _, seed := range seeds {
+		if seed < min {
+			min = seed
+		}
+	}
+
+	return min
+}
+
 func main() {
 	file := readInput(("input"))
 
 	start := time.Now()
 	fmt.Println("Part 1: The lowest location number that corresponds to any of the initial seed numbers is:", part1(file))
 	fmt.Println("Execution Time (Part 1):", time.Now().Sub(start))
+	fmt.Println()
+	start = time.Now()
+	fmt.Println("Part 2: The lowest location number that corresponds to any of the initial seed numbers is:", part2(file))
+	fmt.Println("Execution Time (Part 2):", time.Now().Sub(start))
 }
