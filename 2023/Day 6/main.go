@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -59,10 +60,38 @@ func part1(lines []string) int {
 	return sum
 }
 
+func part2(lines []string) int {
+	var time int
+	var distance int
+
+	for i, line := range lines {
+		line = regexp.MustCompile(`\D`).ReplaceAllString(line, "")
+
+		converted, _ := strconv.Atoi(line)
+		if i == 0 {
+			time = converted
+		} else {
+			distance = converted
+		}
+	}
+
+	counter := 0
+
+	for t := 1; t < time; t++ {
+		d := t * (time - t)
+		if d > distance {
+			counter++
+		}
+	}
+
+	return counter
+}
+
 func main() {
 	file := readInput("input")
 
 	lines := strings.Split(file, "\n")
 
 	fmt.Println("The product of all possible ways to get the record in each race is:", part1(lines))
+	fmt.Println("The possible ways to get the record in the long race is:", part2(lines))
 }
