@@ -21,32 +21,31 @@ func readInput(file string) string {
 }
 
 func convertSeed(seeds []int, lines []string) []int {
-	seedMap := map[int]int{}
+	newSeeds := []int{}
 
 	for _, line := range lines {
 		instructions := strings.Split(line, " ")
 		rangeLength, _ := strconv.Atoi(instructions[2])
 		destination, _ := strconv.Atoi(instructions[0])
 		source, _ := strconv.Atoi(instructions[1])
-		for i := 0; i < rangeLength; i++ {
-			for _, seed := range seeds {
-				if seed == source+i {
-					seedMap[source+i] = destination + i
+		distance := destination - source
+		for i, seed := range seeds {
+			if seed >= source && seed <= source+rangeLength {
+				newSeeds = append(newSeeds, seed+distance)
+				// remove converted seeds from seeds slice
+				if i == 0 {
+					seeds = seeds[1:]
+				} else if i < len(seeds)-1 {
+					seeds = append(seeds[:i], seeds[i+1:]...)
+				} else {
+					seeds = seeds[:len(seeds)-1]
 				}
 			}
 		}
 	}
 
 	for _, seed := range seeds {
-		if _, ok := seedMap[seed]; !ok {
-			seedMap[seed] = seed
-		}
-	}
-
-	newSeeds := []int{}
-
-	for _, seed := range seeds {
-		newSeeds = append(newSeeds, seedMap[seed])
+		newSeeds = append(newSeeds, seed)
 	}
 
 	return newSeeds
@@ -119,6 +118,6 @@ func main() {
 	fmt.Println("Execution Time (Part 1):", time.Now().Sub(start))
 	fmt.Println()
 	start = time.Now()
-	fmt.Println("Part 2: The lowest location number that corresponds to any of the initial seed numbers is:", part2(file))
+	// fmt.Println("Part 2: The lowest location number that corresponds to any of the initial seed numbers is:", part2(file))
 	fmt.Println("Execution Time (Part 2):", time.Now().Sub(start))
 }
