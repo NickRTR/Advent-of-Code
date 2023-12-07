@@ -17,19 +17,54 @@ func readInput(file string) string {
 	return string(rawFile)
 }
 
+func sortByValues(m map[string]int) string {
+	keys := make([]string, 0, len(m))
+
+	for key := range m {
+		keys = append(keys, key)
+	}
+
+	sort.SliceStable(keys, func(i, j int) bool {
+		return m[keys[i]] > m[keys[j]]
+	})
+
+	return keys[0]
+}
+
 var cardValues = map[string]int{
 	"2": 1, "3": 2, "4": 3, "5": 4, "6": 5, "7": 6, "8": 7, "9": 8, "T": 9, "J": 10, "Q": 11, "K": 12, "A": 13,
 }
 
-func getCardValue(card string) int {
+var cardValuesWithJokers = map[string]int{
+	"J": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "T": 9, "Q": 10, "K": 11, "A": 12,
+}
+
+func getCardValue(card string, joker bool) int {
+	if joker {
+		return cardValuesWithJokers[card]
+	}
 	return cardValues[card]
 }
 
-func getHandTypeValue(cards []string) int {
+func getHandTypeValue(cards []string, joker bool) int {
 	values := map[string]int{}
 
+	jokerCount := 0
+
 	for _, card := range cards {
+		if joker && card == "J" {
+			jokerCount += 1
+			continue
+		}
 		values[card] += 1
+	}
+
+	if jokerCount == 5 {
+		return 7
+	}
+
+	if joker {
+		values[sortByValues(values)] += jokerCount
 	}
 
 	switch len(values) {
@@ -57,20 +92,20 @@ func getHandTypeValue(cards []string) int {
 	}
 }
 
-func getHandValue(hand string) int {
+func getHandValue(hand string, joker bool) int {
 	cards := strings.Split(hand, "")
 
-	cardValue := getHandTypeValue(cards)
+	cardValue := getHandTypeValue(cards, joker)
 
 	for _, card := range cards {
-		value := getCardValue(card)
+		value := getCardValue(card, joker)
 		cardValue = cardValue*100 + value
 	}
 
 	return cardValue
 }
 
-func part1(lines []string) int {
+func solution(lines []string, joker bool) int {
 	handValues := map[int]int{}
 	sum := 0
 
@@ -80,7 +115,7 @@ func part1(lines []string) int {
 		bid, _ := strconv.Atoi(parts[1])
 		hand := parts[0]
 
-		value := getHandValue(hand)
+		value := getHandValue(hand, joker)
 
 		handValues[value] += bid
 	}
@@ -103,5 +138,6 @@ func main() {
 
 	lines := strings.Split(file, "\n")
 
-	fmt.Println("Part 1: The total winnings are:", part1(lines))
+	fmt.Println("Part 1: The total winnings are:", solution(lines, false))
+	fmt.Println("Part 2: The total winnings with jokers are:", solution(lines, true))
 }
