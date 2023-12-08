@@ -36,7 +36,7 @@ var cardValues = map[string]int{
 }
 
 var cardValuesWithJokers = map[string]int{
-	"J": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "T": 9, "Q": 10, "K": 11, "A": 12,
+	"J": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "T": 10, "Q": 11, "K": 12, "A": 13,
 }
 
 func getCardValue(card string, joker bool) int {
@@ -117,7 +117,7 @@ func solution(lines []string, joker bool) int {
 
 		value := getHandValue(hand, joker)
 
-		handValues[value] += bid
+		handValues[value] = bid
 	}
 
 	keys := make([]int, 0, len(handValues))
