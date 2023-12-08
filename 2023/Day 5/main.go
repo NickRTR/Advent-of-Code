@@ -69,7 +69,7 @@ func part1(file string) int {
 	}
 
 	// find minimum location
-	min := math.MaxInt64
+	min := seeds[0]
 	for _, seed := range seeds {
 		if seed < min {
 			min = seed
@@ -79,31 +79,70 @@ func part1(file string) int {
 	return min
 }
 
+type interval struct {
+	start int
+	count int
+}
+
+func convertSeedByInterval(seeds []interval, lines []string) []interval {
+	newSeeds := []interval{}
+
+	for _, line := range lines {
+		instructions := strings.Split(line, " ")
+		rangeLength, _ := strconv.Atoi(instructions[2])
+		destination, _ := strconv.Atoi(instructions[0])
+		source, _ := strconv.Atoi(instructions[1])
+		distance := destination - source
+		for i := 0; i < len(seeds); i++ {
+			seed := seeds[i]
+			if seed.start >= source && seed.start <= source+rangeLength {
+				maxRange := int(math.Min(float64(seed.count), float64(source+rangeLength-seed.start)))
+				newSeeds = append(newSeeds, interval{seed.start + distance, maxRange})
+				// remove converted seeds from seeds slice
+				if i == 0 {
+					seeds = seeds[1:]
+				} else if i < len(seeds)-1 {
+					seeds = append(seeds[:i], seeds[i+1:]...)
+				} else {
+					seeds = seeds[:len(seeds)-1]
+				}
+				if maxRange < seed.count {
+					seeds = append(seeds[:i], interval{seed.start + maxRange, seed.count - maxRange})
+				}
+			}
+		}
+	}
+
+	for _, seed := range seeds {
+		newSeeds = append(newSeeds, seed)
+	}
+
+	return newSeeds
+}
+
 func part2(file string) int {
 	sections := strings.Split(file, "\n\n")
 
-	seeds := make([]int, 0, len(sections[0]))
+	seeds := []interval{}
 
 	seedsString := strings.Split(sections[0], " ")
 
-	for i := 1; i < len(seedsString[1:])+1; i += 2 {
+	for i := 1; i <= len(seedsString[1:]); i += 2 {
 		start, _ := strconv.Atoi(seedsString[i])
 		count, _ := strconv.Atoi(seedsString[i+1])
-		for j := start; j < start+count; j++ {
-			seeds = append(seeds, j)
-		}
+		seeds = append(seeds, interval{start, count})
 	}
 
 	for _, section := range sections[1:] {
 		lines := strings.Split(section, "\n")
-		seeds = convertSeed(seeds, lines[1:])
+		seeds = convertSeedByInterval(seeds, lines[1:])
 	}
 
 	// find minimum location
-	min := math.MaxInt64
+	min := seeds[0].start
 	for _, seed := range seeds {
-		if seed < min {
-			min = seed
+		if seed.start < min {
+			min = seed.start
 		}
 	}
 
@@ -118,6 +157,6 @@ func main() {
 	fmt.Println("Execution Time (Part 1):", time.Now().Sub(start))
 	fmt.Println()
 	start = time.Now()
-	// fmt.Println("Part 2: The lowest location number that corresponds to any of the initial seed numbers is:", part2(file))
+	fmt.Println("Part 2: The lowest location number that corresponds to any of the initial seed numbers is:", part2(file))
 	fmt.Println("Execution Time (Part 2):", time.Now().Sub(start))
 }
