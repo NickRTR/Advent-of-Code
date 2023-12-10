@@ -84,8 +84,27 @@ type interval struct {
 	count int
 }
 
+func removeSeeds(seeds []interval, i int) []interval {
+	// remove converted seeds from seeds slice
+	if i == 0 {
+		seeds = seeds[1:]
+	} else if i < len(seeds)-1 {
+		seeds = append(seeds[:i], seeds[i+1:]...)
+	} else {
+		seeds = seeds[:len(seeds)-1]
+	}
+	return seeds
+}
+
 func convertSeedByInterval(seeds []interval, lines []string) []interval {
 	newSeeds := []interval{}
+
+	// - seed range is entirely before mapping range
+	// - seed range starts before mapping range but ends inside mapping range
+	// - seed range starts inside mapping range and ends inside mapping range
+	// - seed range starts inside mapping range but ends outside mapping range
+	// - seed range is entirely after mapping range
+	// - seed range starts before mapping range and ends after mapping range
 
 	for _, line := range lines {
 		instructions := strings.Split(line, " ")
@@ -95,17 +114,25 @@ func convertSeedByInterval(seeds []interval, lines []string) []interval {
 		distance := destination - source
 		for i := 0; i < len(seeds); i++ {
 			seed := seeds[i]
-			if seed.start >= source && seed.start <= source+rangeLength {
+			if seed.start <= source {
+				if seed.start+seed.count <= source+rangeLength && seed.start+seed.count >= source {
+					newSeeds = append(newSeeds, interval{source + distance, seed.count})
+					seeds = removeSeeds(seeds, i)
+					seeds = append(seeds[:i], interval{seed.start, source - seed.start})
+				} else if seed.start+seed.count >= source+rangeLength {
+					seed.start = source
+					seed.count -= source - seed.start
+					maxRange := int(math.Min(float64(seed.count), float64(source+rangeLength-seed.start)))
+					newSeeds = append(newSeeds, interval{source + distance, maxRange})
+					// add seeds after destination
+					seeds = append(seeds[:i], interval{seed.start + rangeLength, seed.count - rangeLength})
+				}
+				// add seeds before destination
+				seeds = append(seeds[:i], interval{seed.start, source - seed.start})
+			} else if seed.start >= source && seed.start <= source+rangeLength {
 				maxRange := int(math.Min(float64(seed.count), float64(source+rangeLength-seed.start)))
 				newSeeds = append(newSeeds, interval{seed.start + distance, maxRange})
-				// remove converted seeds from seeds slice
-				if i == 0 {
-					seeds = seeds[1:]
-				} else if i < len(seeds)-1 {
-					seeds = append(seeds[:i], seeds[i+1:]...)
-				} else {
-					seeds = seeds[:len(seeds)-1]
-				}
+				seeds = removeSeeds(seeds, i)
 				if maxRange < seed.count {
 					seeds = append(seeds[:i], interval{seed.start + maxRange, seed.count - maxRange})
 				}
