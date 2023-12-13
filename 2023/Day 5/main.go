@@ -105,14 +105,11 @@ func convertSeedByInterval(seeds []interval, lines []string) []interval {
 		source, _ := strconv.Atoi(instructions[1])
 		distance := destination - source
 
-		for i := 0; i < len(seeds); i++ {
+		i := 0
+		for i < len(seeds) {
 			seed := seeds[i]
 
-			if seed.start < source && seed.start+seed.count <= source {
-				// seed range is entirely before mapping range
-			} else if seed.start > source+rangeLength {
-				// seed range is entirely after mapping range
-			} else if seed.start < source && seed.start+seed.count <= source+rangeLength && seed.start+seed.count > source {
+			if seed.start < source && seed.start+seed.count <= source+rangeLength && seed.start+seed.count > source {
 				// seed range starts before mapping range but ends inside mapping range
 				newSeeds = append(newSeeds, interval{destination, seed.start + seed.count - source})
 				seeds = removeSeeds(seeds, i)
@@ -132,6 +129,8 @@ func convertSeedByInterval(seeds []interval, lines []string) []interval {
 				seeds = removeSeeds(seeds, i)
 				seeds = append(seeds[:i], interval{seed.start, source - seed.start})
 				seeds = append(seeds, interval{source + rangeLength, seed.start + seed.count - source - rangeLength})
+			} else {
+				i++
 			}
 		}
 	}
