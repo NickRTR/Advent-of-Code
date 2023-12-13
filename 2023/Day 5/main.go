@@ -108,25 +108,25 @@ func convertSeedByInterval(seeds []interval, lines []string) []interval {
 		for i := 0; i < len(seeds); i++ {
 			seed := seeds[i]
 
-			if seed.start <= source && seed.start+seed.count <= source+rangeLength {
+			if seed.start < source && seed.start+seed.count <= source {
 				// seed range is entirely before mapping range
-			} else if seed.start >= source+rangeLength {
+			} else if seed.start > source+rangeLength {
 				// seed range is entirely after mapping range
-			} else if seed.start <= source && seed.start+seed.count <= source+rangeLength {
+			} else if seed.start < source && seed.start+seed.count <= source+rangeLength && seed.start+seed.count > source {
 				// seed range starts before mapping range but ends inside mapping range
-				newSeeds = append(newSeeds, interval{source + distance, seed.count - (source - seed.start)})
+				newSeeds = append(newSeeds, interval{destination, seed.start + seed.count - source})
 				seeds = removeSeeds(seeds, i)
 				seeds = append(seeds[:i], interval{seed.start, source - seed.start})
 			} else if seed.start >= source && seed.start+seed.count <= source+rangeLength {
 				// seed range starts inside mapping range and ends inside mapping range
 				newSeeds = append(newSeeds, interval{seed.start + distance, seed.count})
 				seeds = removeSeeds(seeds, i)
-			} else if seed.start >= source && seed.start <= source+rangeLength && seed.start+seed.count >= source+rangeLength {
+			} else if seed.start >= source && seed.start < source+rangeLength && seed.start+seed.count > source+rangeLength {
 				// seed range starts inside mapping range but ends outside mapping range
 				newSeeds = append(newSeeds, interval{seed.start + distance, source + rangeLength - seed.start})
 				seeds = removeSeeds(seeds, i)
-				seeds = append(seeds[:i], interval{seed.start + rangeLength, seed.count - rangeLength})
-			} else if seed.start <= source && seed.start+seed.count >= source+rangeLength {
+				seeds = append(seeds[:i], interval{source + rangeLength, seed.start + seed.count - source - rangeLength})
+			} else if seed.start < source && seed.start+seed.count > source+rangeLength {
 				// seed range starts before mapping range and ends after mapping range
 				newSeeds = append(newSeeds, interval{source + distance, rangeLength})
 				seeds = removeSeeds(seeds, i)
