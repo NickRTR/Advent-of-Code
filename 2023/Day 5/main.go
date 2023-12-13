@@ -105,34 +105,31 @@ func convertSeedByInterval(seeds []interval, lines []string) []interval {
 		source, _ := strconv.Atoi(instructions[1])
 		distance := destination - source
 
-		i := 0
-		for i < len(seeds) {
-			seed := seeds[i]
+		modifiedSeeds := []interval{}
 
+		for _, seed := range seeds {
 			if seed.start < source && seed.start+seed.count <= source+rangeLength && seed.start+seed.count > source {
 				// seed range starts before mapping range but ends inside mapping range
 				newSeeds = append(newSeeds, interval{destination, seed.start + seed.count - source})
-				seeds = removeSeeds(seeds, i)
-				seeds = append(seeds[:i], interval{seed.start, source - seed.start})
+				modifiedSeeds = append(modifiedSeeds, interval{seed.start, source - seed.start})
 			} else if seed.start >= source && seed.start+seed.count <= source+rangeLength {
 				// seed range starts inside mapping range and ends inside mapping range
 				newSeeds = append(newSeeds, interval{seed.start + distance, seed.count})
-				seeds = removeSeeds(seeds, i)
 			} else if seed.start >= source && seed.start < source+rangeLength && seed.start+seed.count > source+rangeLength {
 				// seed range starts inside mapping range but ends outside mapping range
 				newSeeds = append(newSeeds, interval{seed.start + distance, source + rangeLength - seed.start})
-				seeds = removeSeeds(seeds, i)
-				seeds = append(seeds[:i], interval{source + rangeLength, seed.start + seed.count - source - rangeLength})
+				modifiedSeeds = append(modifiedSeeds, interval{source + rangeLength, seed.start + seed.count - source - rangeLength})
 			} else if seed.start < source && seed.start+seed.count > source+rangeLength {
 				// seed range starts before mapping range and ends after mapping range
 				newSeeds = append(newSeeds, interval{source + distance, rangeLength})
-				seeds = removeSeeds(seeds, i)
-				seeds = append(seeds[:i], interval{seed.start, source - seed.start})
-				seeds = append(seeds, interval{source + rangeLength, seed.start + seed.count - source - rangeLength})
+				modifiedSeeds = append(modifiedSeeds, interval{seed.start, source - seed.start})
+				modifiedSeeds = append(modifiedSeeds, interval{source + rangeLength, seed.start + seed.count - source - rangeLength})
 			} else {
-				i++
+				modifiedSeeds = append(modifiedSeeds, seed)
 			}
 		}
+
+		seeds = modifiedSeeds
 	}
 
 	for _, seed := range seeds {
