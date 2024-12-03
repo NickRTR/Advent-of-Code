@@ -55,8 +55,6 @@ func reportVariations(report []int) bool {
 func part1(reports [][]int) (int, time.Duration) {
 	start := time.Now()
 
-	duration := time.Since(start)
-
 	saveReports := 0
 
 	for _, report := range reports {
@@ -65,13 +63,13 @@ func part1(reports [][]int) (int, time.Duration) {
 		}
 	}
 
+	duration := time.Since(start)
+
 	return saveReports, duration
 }
 
 func part2(reports [][]int) (int, time.Duration) {
 	start := time.Now()
-
-	duration := time.Since(start)
 
 	saveReports := 0
 
@@ -84,6 +82,8 @@ func part2(reports [][]int) (int, time.Duration) {
 			}
 		}
 	}
+
+	duration := time.Since(start)
 
 	return saveReports, duration
 }
